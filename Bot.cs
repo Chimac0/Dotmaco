@@ -10,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace Dotmaco
 {
@@ -76,7 +77,7 @@ namespace Dotmaco
                 json = await sr.ReadToEndAsync().ConfigureAwait(false);
 
             var configJson = JsonConvert.DeserializeObject<ConfigJson>(json);
-
+            Console.WriteLine(configJson.Token);
             var config = new DiscordConfiguration()
             {
                 Token = configJson.Token,
@@ -154,6 +155,8 @@ namespace Dotmaco
                     Console.WriteLine("Exception: " + exc.Message);
                 }
                 var inputMessage = e.Message.Content.Replace("\n", " ").Replace("\r", " ");
+                inpmsg.Add(lastline);
+                outmsg.Add(inputMessage);
                 var outputMessage = "yee";
                 var similarCandidates = new List<string>();
                 var similarity = new double();
@@ -185,8 +188,7 @@ namespace Dotmaco
                     similar_input = similarInputs[r];
                 }
                 Console.WriteLine("Input chosen: "+similar_input+", with similarity "+similarity+" to "+inputMessage+". Output: "+outputMessage);
-                inpmsg.Add(lastline);
-                outmsg.Add(inputMessage);
+
                 try
                 {
                     StreamWriter sw = new StreamWriter("inputsave.txt");
@@ -209,6 +211,7 @@ namespace Dotmaco
                 {
                     Console.WriteLine("Exception: " + excc.Message);
                 }
+                if (outputMessage == "") { outputMessage = " "; }
                 await s.SendMessageAsync(e.Channel,outputMessage);
             }
         }
